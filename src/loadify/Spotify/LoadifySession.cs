@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -69,12 +70,56 @@ namespace loadify.Spotify
             _Session.Login(username, password, false, null);
         }
 
-        public async Task<PlaylistCollection> GetPlaylistCollection()
+        public async Task<PlaylistContainer> GetPlaylistContainer()
         {
             var container = _Session.Playlistcontainer();
             if (container == null) throw new SpotifyException(SpotifyError.SystemFailure, "Playlist container could not be retrieved from the library");
             await SpotifyObject.WaitForInitialization(container.IsLoaded);
-            return new PlaylistCollection(container);
+            return container;
+        }
+
+        public async Task AddPlaylist(Playlist playlist)
+        {
+            var container = await GetPlaylistContainer();
+            container.AddPlaylist(Link.CreateFromPlaylist(playlist));
+
+            container.Release();
+        }
+
+        public async Task RemovePlaylist(Playlist playlist)
+        {
+            var container = await GetPlaylistContainer();
+
+            for (var i = 0; i < container.NumPlaylists(); i++)
+            {
+                var unmanagedPlaylist = container.Playlist(i);
+                await SpotifyObject.WaitForInitialization(unmanagedPlaylist.IsLoaded);
+
+                if (unmanagedPlaylist.Name() == playlist.Name())
+                {
+                    container.RemovePlaylist(i);
+                    break;
+                }
+            }
+
+            container.Release();
+        }
+
+        public async Task<IEnumerable<Playlist>> GetPlaylists()
+        {
+            var container = await GetPlaylistContainer();
+            var playlists = new List<Playlist>();
+
+            for (var i = 0; i < container.NumPlaylists(); i++)
+            {
+                var unmanagedPlaylist = container.Playlist(i);
+                if (unmanagedPlaylist == null) continue;
+                await SpotifyObject.WaitForInitialization(unmanagedPlaylist.IsLoaded);
+                playlists.Add(unmanagedPlaylist);
+            }
+
+            container.Release();
+            return playlists;
         }
 
         public Image GetImage(ImageId imageId)
@@ -113,14 +158,19 @@ namespace loadify.Spotify
             }, cancellationToken);
         }
 
+        public Playlist GetPlaylist(Link link)
+        {
+            if (link == null) throw new ArgumentException("The link object can't be null");
+
+            var unmanagedPlaylist = Playlist.Create(_Session, link);
+            return unmanagedPlaylist;
+        }
+
         public Playlist GetPlaylist(string url)
         {
             var link = Link.CreateFromString(url);
             if (link == null) throw new InvalidSpotifyUrlException(url);
-
-            var unmanagedPlaylist = Playlist.Create(_Session, link);
-            if (unmanagedPlaylist == null) throw new InvalidSpotifyUrlException(url);
-            return unmanagedPlaylist;
+            return GetPlaylist(link);
         }
 
         public Track GetTrack(string url)
