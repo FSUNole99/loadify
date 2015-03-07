@@ -10,6 +10,8 @@ namespace loadify.Spotify
     public class LoadifySession : SpotifySessionListener
     {
         private SpotifySession _Session { get; set; }
+        private PlaylistContainer _PlaylistContainer { get; set; }
+
         private SynchronizationContext _Synchronization { get; set; }
         private TrackDownloadService _TrackDownloadService { get; set; }
 
@@ -38,9 +40,9 @@ namespace loadify.Spotify
         {
             if (_Session == null) return;
             _Session.Logout();
-            
-            if(_Session.Playlistcontainer() != null)
-                _Session.Playlistcontainer().Release();
+
+
+            _PlaylistContainer.Release();
         }
 
         private void Setup()
@@ -70,55 +72,49 @@ namespace loadify.Spotify
             _Session.Login(username, password, false, null);
         }
 
-        public async Task<PlaylistContainer> GetPlaylistContainer()
+        private async Task LoadPlaylistContainer()
         {
-            var container = _Session.Playlistcontainer();
-            if (container == null) throw new SpotifyException(SpotifyError.SystemFailure, "Playlist container could not be retrieved from the library");
-            await SpotifyObject.WaitForInitialization(container.IsLoaded);
-            return container;
+            _PlaylistContainer = _Session.Playlistcontainer();
+            if (_PlaylistContainer == null) throw new SpotifyException(SpotifyError.SystemFailure, "Playlist container could not be retrieved from the library");
+            await SpotifyObject.WaitForInitialization(_PlaylistContainer.IsLoaded);
         }
 
-        public async Task AddPlaylist(Playlist playlist)
+        public void AddPlaylist(Playlist playlist)
         {
-            var container = await GetPlaylistContainer();
-            container.AddPlaylist(Link.CreateFromPlaylist(playlist));
-
-            container.Release();
+            if (_PlaylistContainer == null) throw new ResourceException("The playlist container wasn't retrieved yet");
+            _PlaylistContainer.AddPlaylist(Link.CreateFromPlaylist(playlist));
         }
 
         public async Task RemovePlaylist(Playlist playlist)
         {
-            var container = await GetPlaylistContainer();
+            if (_PlaylistContainer == null) throw new ResourceException("The playlist container wasn't retrieved yet");
 
-            for (var i = 0; i < container.NumPlaylists(); i++)
+            for (var i = 0; i < _PlaylistContainer.NumPlaylists(); i++)
             {
-                var unmanagedPlaylist = container.Playlist(i);
+                var unmanagedPlaylist = _PlaylistContainer.Playlist(i);
                 await SpotifyObject.WaitForInitialization(unmanagedPlaylist.IsLoaded);
 
                 if (unmanagedPlaylist.Name() == playlist.Name())
                 {
-                    container.RemovePlaylist(i);
+                    _PlaylistContainer.RemovePlaylist(i);
                     break;
                 }
             }
-
-            container.Release();
         }
 
         public async Task<IEnumerable<Playlist>> GetPlaylists()
         {
-            var container = await GetPlaylistContainer();
+            if (_PlaylistContainer == null) throw new ResourceException("The playlist container wasn't retrieved yet");
             var playlists = new List<Playlist>();
 
-            for (var i = 0; i < container.NumPlaylists(); i++)
+            for (var i = 0; i < _PlaylistContainer.NumPlaylists(); i++)
             {
-                var unmanagedPlaylist = container.Playlist(i);
+                var unmanagedPlaylist = _PlaylistContainer.Playlist(i);
                 if (unmanagedPlaylist == null) continue;
                 await SpotifyObject.WaitForInitialization(unmanagedPlaylist.IsLoaded);
                 playlists.Add(unmanagedPlaylist);
             }
 
-            container.Release();
             return playlists;
         }
 
@@ -135,7 +131,8 @@ namespace loadify.Spotify
                 {
                     _TrackDownloadService = trackDownloadService;
                     _TrackDownloadService.Start();
-                    _Session.PlayerLoad(trackDownloadService.Track);
+
+                    _Session.PlayerLoad(trackDownloadService.UnmanagedTrack);
                     _Session.PlayerPlay(true);
 
                     while (true)
@@ -208,6 +205,7 @@ namespace loadify.Spotify
             {
                 await SpotifyObject.WaitForInitialization(session.User().IsLoaded);
                 _Session.PreferredBitrate(BitRate._320k);
+                await LoadPlaylistContainer();
             }
 
             _LoggedInCallback(error);

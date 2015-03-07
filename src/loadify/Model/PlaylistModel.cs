@@ -55,6 +55,9 @@ namespace loadify.Model
         public PlaylistModel()
         {
             Tracks = new List<TrackModel>();
+            Name = "";
+            Description = "";
+            Creator = "";
         }
 
         public PlaylistModel(PlaylistModel playlist)

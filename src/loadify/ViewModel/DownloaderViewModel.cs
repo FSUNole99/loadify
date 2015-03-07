@@ -130,10 +130,12 @@ namespace loadify.ViewModel
 
                 try
                 {
-                    var spotifyTrack = session.GetTrack(CurrentTrack.Track.Link);
                     var coverImage = session.GetImage(CurrentTrack.Album.CoverImageID);
+                    await SpotifyObject.WaitForInitialization(coverImage.IsLoaded);
+                    var spotifyTrack = session.GetTrack(CurrentTrack.Track.Link);
 
-                    var trackDownloadService = new TrackDownloadService(spotifyTrack,
+                    var trackDownloadService = new TrackDownloadService(spotifyTrack, 
+                        CurrentTrack.Track,
                         _SettingsManager.BehaviorSetting.AudioProcessor,
                         _SettingsManager.BehaviorSetting.DownloadPathConfigurator)
                     {

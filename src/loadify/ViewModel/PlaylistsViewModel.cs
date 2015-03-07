@@ -204,7 +204,7 @@ namespace loadify.ViewModel
                     if (message.Permanent)
                     {
                         _Logger.Debug(String.Format("Adding playlist {0} permanently to the logged-in Spotify account...", playlist.Name));
-                        await message.Session.AddPlaylist(message.Session.GetPlaylist(playlist.Link));
+                        message.Session.AddPlaylist(message.Session.GetPlaylist(playlist.Link));
                         _Logger.Info(String.Format("Playlist {0} was added permanently to the logged-in Spotify account", playlist.Name));
                     }
 

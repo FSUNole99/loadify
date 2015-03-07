@@ -32,7 +32,9 @@ namespace loadify.Model
             trackModel.Name = unmanagedTrack.Name();
             trackModel.Duration = TimeSpan.FromMilliseconds(unmanagedTrack.Duration());
             trackModel.Rating = unmanagedTrack.Popularity();
-            trackModel.Album = await AlbumModel.FromLibrary(unmanagedTrack.Album());
+
+            var unmanagedAlbum = unmanagedTrack.Album();
+            trackModel.Album = await AlbumModel.FromLibrary(unmanagedAlbum);
 
             var trackLink = SpotifySharp.Link.CreateFromTrack(unmanagedTrack, 0);
             trackModel.Link = trackLink.AsString();

@@ -45,7 +45,8 @@ namespace loadify.Spotify
         public IAudioFileDescriptor AudioFileDescriptor { get; set; }
         public IDownloadPathConfigurator DownloadPathConfigurator { get; set; }
         public bool Cleanup { get; set; }
-        public Track Track { get; set; }
+        public TrackModel Track { get; set; }
+        public Track UnmanagedTrack { get; set; }
         public Action<double> DownloadProgressUpdated = progress => { };
 
         private Statistic _Statistic = new Statistic();
@@ -62,8 +63,9 @@ namespace loadify.Spotify
             }
         }
 
-        public TrackDownloadService(Track track, AudioProcessor audioProcessor, IDownloadPathConfigurator downloadPathConfigurator)
+        public TrackDownloadService(Track unmanagedTrack, TrackModel track, AudioProcessor audioProcessor, IDownloadPathConfigurator downloadPathConfigurator)
         {
+            UnmanagedTrack = unmanagedTrack;
             Track = track;
             AudioProcessor = audioProcessor;
             DownloadPathConfigurator = downloadPathConfigurator;
@@ -73,11 +75,10 @@ namespace loadify.Spotify
             OutputDirectory = "download";
         }
 
-        public async void Start()
+        public void Start()
         {
-            var trackModel = await TrackModel.FromLibrary(Track);
-            _Statistic = new Statistic(trackModel.Duration);
-            _DownloadFilePath = DownloadPathConfigurator.Configure(OutputDirectory, AudioProcessor.TargetFileExtension, trackModel);
+            _Statistic = new Statistic(Track.Duration);
+            _DownloadFilePath = DownloadPathConfigurator.Configure(OutputDirectory, AudioProcessor.TargetFileExtension, Track);
             AudioProcessor.Start(_DownloadFilePath);
             Active = true;
         }
@@ -104,11 +105,11 @@ namespace loadify.Spotify
             Active = false;
         }
 
-        public async void Complete()
+        public void Complete()
         {
             Stop();
-            var trackModel = await TrackModel.FromLibrary(Track);
-            var converterOutputPath = DownloadPathConfigurator.Configure(OutputDirectory, AudioConverter.TargetFileExtension, trackModel);
+
+            var converterOutputPath = DownloadPathConfigurator.Configure(OutputDirectory, AudioConverter.TargetFileExtension, Track);
 
             if (AudioConverter != null)
                 AudioConverter.Convert(_DownloadFilePath, converterOutputPath);
