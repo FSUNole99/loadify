@@ -6,10 +6,8 @@ using SpotifySharp;
 
 namespace loadify.Model
 {
-    public class TrackModel
+    public class TrackModel : SpotifyObjectModel
     {
-        public Track UnmanagedTrack { get; set; }
-
         public string Name { get; set; }
         public PlaylistModel Playlist { get; set; }
         public TimeSpan Duration { get; set; }
@@ -18,12 +16,6 @@ namespace loadify.Model
         public AlbumModel Album { get; set; }
         public bool ExistsLocally { get; set; }
 
-        public TrackModel(Track unmanagedTrack):
-            this()
-        {
-            UnmanagedTrack = unmanagedTrack;
-        }
-
         public TrackModel()
         {
             Artists = new List<ArtistModel>();
@@ -31,23 +23,27 @@ namespace loadify.Model
             Playlist = new PlaylistModel();
         }
 
-        public static async Task<TrackModel> FromLibrary(Track unmanagedTrack, LoadifySession session)
+        public static async Task<TrackModel> FromLibrary(Track unmanagedTrack)
         {
-            var trackModel = new TrackModel(unmanagedTrack);
+            var trackModel = new TrackModel();
             if (unmanagedTrack == null) return trackModel;
             await SpotifyObject.WaitForInitialization(unmanagedTrack.IsLoaded);
 
             trackModel.Name = unmanagedTrack.Name();
             trackModel.Duration = TimeSpan.FromMilliseconds(unmanagedTrack.Duration());
             trackModel.Rating = unmanagedTrack.Popularity();
-            trackModel.Album = await AlbumModel.FromLibrary(unmanagedTrack.Album(), session);
+            trackModel.Album = await AlbumModel.FromLibrary(unmanagedTrack.Album());
+
+            var trackLink = SpotifySharp.Link.CreateFromTrack(unmanagedTrack, 0);
+            trackModel.Link = trackLink.AsString();
+            trackLink.Release();
 
             for (var j = 0; j < unmanagedTrack.NumArtists(); j++)
             {
                 var unmanagedArtist = unmanagedTrack.Artist(j);
                 if (unmanagedArtist == null) continue;
 
-                trackModel.Artists.Add(await ArtistModel.FromLibrary(unmanagedArtist, session));
+                trackModel.Artists.Add(await ArtistModel.FromLibrary(unmanagedArtist));
             }
 
             return trackModel;

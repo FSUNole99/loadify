@@ -135,7 +135,7 @@ namespace loadify.Spotify
                 {
                     _TrackDownloadService = trackDownloadService;
                     _TrackDownloadService.Start();
-                    _Session.PlayerLoad(trackDownloadService.Track.UnmanagedTrack);
+                    _Session.PlayerLoad(trackDownloadService.Track);
                     _Session.PlayerPlay(true);
 
                     while (true)

@@ -45,7 +45,7 @@ namespace loadify.Spotify
         public IAudioFileDescriptor AudioFileDescriptor { get; set; }
         public IDownloadPathConfigurator DownloadPathConfigurator { get; set; }
         public bool Cleanup { get; set; }
-        public TrackModel Track { get; set; }
+        public Track Track { get; set; }
         public Action<double> DownloadProgressUpdated = progress => { };
 
         private Statistic _Statistic = new Statistic();
@@ -62,7 +62,7 @@ namespace loadify.Spotify
             }
         }
 
-        public TrackDownloadService(TrackModel track, AudioProcessor audioProcessor, IDownloadPathConfigurator downloadPathConfigurator)
+        public TrackDownloadService(Track track, AudioProcessor audioProcessor, IDownloadPathConfigurator downloadPathConfigurator)
         {
             Track = track;
             AudioProcessor = audioProcessor;
@@ -73,10 +73,11 @@ namespace loadify.Spotify
             OutputDirectory = "download";
         }
 
-        public void Start()
+        public async void Start()
         {
-            _Statistic = new Statistic(Track.Duration);
-            _DownloadFilePath = DownloadPathConfigurator.Configure(OutputDirectory, AudioProcessor.TargetFileExtension, Track);
+            var trackModel = await TrackModel.FromLibrary(Track);
+            _Statistic = new Statistic(trackModel.Duration);
+            _DownloadFilePath = DownloadPathConfigurator.Configure(OutputDirectory, AudioProcessor.TargetFileExtension, trackModel);
             AudioProcessor.Start(_DownloadFilePath);
             Active = true;
         }
@@ -103,10 +104,11 @@ namespace loadify.Spotify
             Active = false;
         }
 
-        public void Complete()
+        public async void Complete()
         {
             Stop();
-            var converterOutputPath = DownloadPathConfigurator.Configure(OutputDirectory, AudioConverter.TargetFileExtension, Track);
+            var trackModel = await TrackModel.FromLibrary(Track);
+            var converterOutputPath = DownloadPathConfigurator.Configure(OutputDirectory, AudioConverter.TargetFileExtension, trackModel);
 
             if (AudioConverter != null)
                 AudioConverter.Convert(_DownloadFilePath, converterOutputPath);

@@ -159,10 +159,11 @@ namespace loadify.ViewModel
             Playlists = new ObservableCollection<PlaylistViewModel>();
             foreach (var playlist in playlists)
             {
-                var fetchedPlaylistViewModel = new PlaylistViewModel(await PlaylistModel.FromLibrary(playlist, message.Session),
+                var fetchedPlaylistViewModel = new PlaylistViewModel(await PlaylistModel.FromLibrary(playlist),
                                                                     _EventAggregator, _SettingsManager);     
                 Playlists.Add(fetchedPlaylistViewModel);
                 _Logger.Info(String.Format("Added playlist {0} ({1} tracks)", fetchedPlaylistViewModel.Name, fetchedPlaylistViewModel.Tracks.Count));
+                playlist.Release();
             }
 
             _Logger.Info("Retrieving playlists finished");
@@ -194,7 +195,9 @@ namespace loadify.ViewModel
                     _EventAggregator.PublishOnUIThread(new DisplayProgressEvent("Adding Playlist...",
                                                                                 Localization.Playlists.AddPlaylistProcessingDialogMessage));
                     _Logger.Debug(String.Format("Resolving playlist link {0}...", message.Content));
-                    var playlist = await PlaylistModel.FromLibrary(message.Session.GetPlaylist(message.Content), message.Session);
+                    var unmanagedPlaylist = message.Session.GetPlaylist(message.Content);
+                    var playlist = await PlaylistModel.FromLibrary(unmanagedPlaylist);
+                    unmanagedPlaylist.Release();
                     _Logger.Info(String.Format("Playlist {0} ({1} tracks) was resolved and added to the playlist collection", playlist.Name, playlist.Tracks.Count));
                     Playlists.Add(new PlaylistViewModel(playlist, _EventAggregator, _SettingsManager));
 
@@ -234,7 +237,9 @@ namespace loadify.ViewModel
                     _EventAggregator.PublishOnUIThread(new DisplayProgressEvent("Adding Track...",
                                                         String.Format(Localization.Playlists.AddTrackProcessingDialogMessage, message.Playlist.Name)));
                     _Logger.Debug(String.Format("Resolving track link {0}...", message.Content));
-                    var track = await TrackModel.FromLibrary(message.Session.GetTrack(message.Content), message.Session);
+                    var unmanagedTrack = message.Session.GetTrack(message.Content);
+                    var track = await TrackModel.FromLibrary(message.Session.GetTrack(message.Content));
+                    unmanagedTrack.Release();
                     track.Playlist = message.Playlist.Playlist;
                     _Logger.Info(String.Format("Track {0} was resolved and added to playlist {1}", track.Name, track.Playlist.Name));
                     message.Playlist.Tracks.Add(new TrackViewModel(track, _EventAggregator, _SettingsManager));

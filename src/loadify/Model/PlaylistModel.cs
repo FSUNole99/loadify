@@ -15,11 +15,12 @@ namespace loadify.Model
         public string Creator { get; set; }
         public ImageId ImageID { get; set; }
 
-        public static async Task<PlaylistModel> FromLibrary(Playlist unmanagedPlaylist, LoadifySession session)
+        public static async Task<PlaylistModel> FromLibrary(Playlist unmanagedPlaylist)
         {
             var playlistModel = new PlaylistModel();
             if (unmanagedPlaylist == null) return playlistModel;
-            
+            await SpotifyObject.WaitForInitialization(unmanagedPlaylist.IsLoaded);
+
             playlistModel.Name = unmanagedPlaylist.Name() ?? "";
             playlistModel.Subscribers = unmanagedPlaylist.Subscribers().ToList();
             playlistModel.Creator = unmanagedPlaylist.Owner().DisplayName() ?? "";
@@ -42,7 +43,7 @@ namespace loadify.Model
             {
                 var unmanagedTrack = unmanagedPlaylist.Track(i);
                 if (unmanagedTrack == null) continue;
-                var managedTrack = await TrackModel.FromLibrary(unmanagedTrack, session);
+                var managedTrack = await TrackModel.FromLibrary(unmanagedTrack);
                 managedTrack.Playlist = playlistModel;
                  
                 playlistModel.Tracks.Add(managedTrack);

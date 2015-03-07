@@ -4,25 +4,22 @@ using SpotifySharp;
 
 namespace loadify.Model
 {
-    public class ArtistModel
+    public class ArtistModel : SpotifyObjectModel
     {
-        private readonly Artist _UnmanagedArtist;
-
         public string Name { get; set; }
-        public byte[] Portrait { get; set; }
 
-        public ArtistModel(Artist unmanagedArtist)
+        public static async Task<ArtistModel> FromLibrary(Artist unmanagedArtist)
         {
-            _UnmanagedArtist = unmanagedArtist;
-        }
-
-        public static async Task<ArtistModel> FromLibrary(Artist unmanagedArtist, LoadifySession session)
-        {
-            var artistModel = new ArtistModel(unmanagedArtist);
+            var artistModel = new ArtistModel();
             if (unmanagedArtist == null) return artistModel;
             await SpotifyObject.WaitForInitialization(unmanagedArtist.IsLoaded);
 
             artistModel.Name = unmanagedArtist.Name();
+
+            var artistLink = SpotifySharp.Link.CreateFromArtist(unmanagedArtist);
+            artistModel.Link = artistLink.AsString();
+            artistLink.Release();
+
             return artistModel;
         }
     }

@@ -130,7 +130,10 @@ namespace loadify.ViewModel
 
                 try
                 {
-                    var trackDownloadService = new TrackDownloadService(CurrentTrack.Track,
+                    var spotifyTrack = session.GetTrack(CurrentTrack.Track.Link);
+                    var coverImage = session.GetImage(CurrentTrack.Album.CoverImageID);
+
+                    var trackDownloadService = new TrackDownloadService(spotifyTrack,
                         _SettingsManager.BehaviorSetting.AudioProcessor,
                         _SettingsManager.BehaviorSetting.DownloadPathConfigurator)
                     {
@@ -144,7 +147,7 @@ namespace loadify.ViewModel
                             Artists = CurrentTrack.Artists.Select(artist => artist.Name),
                             Album = CurrentTrack.Album.Name,
                             Year = CurrentTrack.Album.ReleaseYear,
-                            Cover = CurrentTrack.Album.Cover
+                            Cover = coverImage.Data()
                         },
                         DownloadProgressUpdated = progress =>
                         {
@@ -158,6 +161,8 @@ namespace loadify.ViewModel
                                                 CurrentTrack.ToString()));
                     _Logger.Info(String.Format("Downloading {0}...", CurrentTrack.ToString()));
                     await session.DownloadTrack(trackDownloadService, _CancellationToken.Token);
+                    spotifyTrack.Release();
+                    coverImage.Release();
                     _Logger.Debug(String.Format("Track downloaded with result: {0}", trackDownloadService.Cancellation.ToString()));
 
                     if (trackDownloadService.Cancellation == TrackDownloadService.CancellationReason.UserInteraction)
