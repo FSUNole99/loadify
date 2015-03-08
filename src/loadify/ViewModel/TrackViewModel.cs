@@ -131,7 +131,8 @@ namespace loadify.ViewModel
                 var trackAudioFilePath = _SettingsManager.BehaviorSetting.DownloadPathConfigurator.Configure(
                                                         _SettingsManager.DirectorySetting.DownloadDirectory,
                                                         _SettingsManager.BehaviorSetting.AudioConverter.TargetFileExtension,
-                                                        Track);
+                                                        Track.Name,
+                                                        Track.Playlist.Name);
 
                 // if the audio file for that track exists, open the explorer and select (or highlight) the track using the
                 // /select command line switch. Note that the path should be wrapped by quotes (") since the explorer will treat the path

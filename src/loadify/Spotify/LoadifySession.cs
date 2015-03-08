@@ -132,7 +132,7 @@ namespace loadify.Spotify
                     _TrackDownloadService = trackDownloadService;
                     _TrackDownloadService.Start();
 
-                    _Session.PlayerLoad(trackDownloadService.UnmanagedTrack);
+                    _Session.PlayerLoad(trackDownloadService.Track);
                     _Session.PlayerPlay(true);
 
                     while (true)
@@ -236,7 +236,7 @@ namespace loadify.Spotify
         public override void EndOfTrack(SpotifySession session)
         {
             _Session.PlayerPlay(false);
-            _TrackDownloadService.Complete();
+            _TrackDownloadService.Stop();
         }
     }
 }

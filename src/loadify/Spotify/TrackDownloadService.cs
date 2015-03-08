@@ -37,20 +37,13 @@ namespace loadify.Spotify
 
         public bool Active { get; set; }
         public CancellationReason Cancellation { get; set; }
-        public string OutputDirectory { get; set; }
-        public Mp3MetaData Mp3MetaData { get; set; }
         public AudioMetaData AudioMetaData { get; set; }
         public AudioProcessor AudioProcessor { get; set; }
-        public AudioConverter AudioConverter { get; set; }
-        public IAudioFileDescriptor AudioFileDescriptor { get; set; }
-        public IDownloadPathConfigurator DownloadPathConfigurator { get; set; }
-        public bool Cleanup { get; set; }
-        public TrackModel Track { get; set; }
-        public Track UnmanagedTrack { get; set; }
+        public Track Track { get; set; }
         public Action<double> DownloadProgressUpdated = progress => { };
+        public string DownloadFilePath { get; set; }
 
         private Statistic _Statistic = new Statistic();
-        private string _DownloadFilePath;
 
         public double Progress
         {
@@ -63,23 +56,19 @@ namespace loadify.Spotify
             }
         }
 
-        public TrackDownloadService(Track unmanagedTrack, TrackModel track, AudioProcessor audioProcessor, IDownloadPathConfigurator downloadPathConfigurator)
+        public TrackDownloadService(Track track, AudioProcessor audioProcessor, string downloadFilePath)
         {
-            UnmanagedTrack = unmanagedTrack;
             Track = track;
             AudioProcessor = audioProcessor;
-            DownloadPathConfigurator = downloadPathConfigurator;
             AudioMetaData = new AudioMetaData();
-            Mp3MetaData = new Mp3MetaData();
-            Cleanup = true;
-            OutputDirectory = "download";
+            DownloadFilePath = downloadFilePath;
         }
 
         public void Start()
         {
-            _Statistic = new Statistic(Track.Duration);
-            _DownloadFilePath = DownloadPathConfigurator.Configure(OutputDirectory, AudioProcessor.TargetFileExtension, Track);
-            AudioProcessor.Start(_DownloadFilePath);
+            _Statistic = new Statistic(TimeSpan.FromMilliseconds(Track.Duration()));
+            
+            AudioProcessor.Start(DownloadFilePath);
             Active = true;
         }
 
@@ -99,39 +88,15 @@ namespace loadify.Spotify
             DownloadProgressUpdated(Progress);
         }
 
-        private void Stop()
+        public void Stop()
         {
             AudioProcessor.Release();
             Active = false;
         }
 
-        public void Complete()
-        {
-            Stop();
-
-            var converterOutputPath = DownloadPathConfigurator.Configure(OutputDirectory, AudioConverter.TargetFileExtension, Track);
-
-            if (AudioConverter != null)
-                AudioConverter.Convert(_DownloadFilePath, converterOutputPath);
-
-            if (AudioFileDescriptor != null)
-                AudioFileDescriptor.Write(Mp3MetaData, (AudioConverter != null) ? converterOutputPath : _DownloadFilePath);
-
-            Finish();
-        }
-
-        private void Finish()
-        {
-            if (!Cleanup) return;
-
-            if (File.Exists(_DownloadFilePath))
-                File.Delete(_DownloadFilePath);
-        }
-
         public void Cancel(CancellationReason reason)
         {
             Stop();
-            Finish();
             Cancellation = reason;
         }
     }

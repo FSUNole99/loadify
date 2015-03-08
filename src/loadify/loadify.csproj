@@ -273,7 +273,7 @@
     <Compile Include="Model\TrackModel.cs" />
     <Compile Include="Model\UserModel.cs" />
     <Compile Include="Audio\IAudioFileDescriptor.cs" />
-    <Compile Include="Configuration\IDownloadPathConfigurator.cs" />
+    <Compile Include="Configuration\IFilePathConfigurator.cs" />
     <Compile Include="Spotify\InvalidSpotifyUrlException.cs" />
     <Compile Include="Spotify\LoadifySession.cs" />
     <Compile Include="Model\PlaylistModel.cs" />

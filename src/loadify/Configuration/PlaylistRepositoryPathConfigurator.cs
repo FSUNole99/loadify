@@ -8,15 +8,14 @@ namespace loadify.Configuration
 {
     public class PlaylistRepositoryPathConfigurator : IDownloadPathConfigurator
     {
-        public string Configure(string basePath, string targetFileExtension, TrackModel track)
+        public string Configure(string basePath, string targetFileExtension, string trackName, string playlistName)
         {
             basePath += (basePath.Last() != '\\') ? "\\" : "";
-            var completePath = basePath + track.Name.ValidateFileName();
+            var completePath = basePath + trackName.ValidateFileName();
 
-            if (track.Playlist == null) return completePath;
-            if (track.Playlist.Name.Length == 0) return completePath;
+            if (playlistName.Length == 0) return completePath;
 
-            var playlistRepositoryDirectory = basePath + track.Playlist.Name.ValidateFileName() + "\\";
+            var playlistRepositoryDirectory = basePath + playlistName.ValidateFileName() + "\\";
             try
             {
                 if (!Directory.Exists(playlistRepositoryDirectory))
@@ -31,7 +30,7 @@ namespace loadify.Configuration
                 throw new ConfigurationException("An unhandled configuration error occured", exception);
             }
 
-            completePath = playlistRepositoryDirectory + track.Name.ValidateFileName() + "." + targetFileExtension;
+            completePath = playlistRepositoryDirectory + trackName.ValidateFileName() + "." + targetFileExtension;
             return completePath;
         }
     }

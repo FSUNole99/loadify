@@ -31,7 +31,8 @@ namespace loadify.ViewModel
                                             (_SettingsManager.BehaviorSetting.AudioConverter != null
                                                 ? _SettingsManager.BehaviorSetting.AudioConverter.TargetFileExtension
                                                 : _SettingsManager.BehaviorSetting.AudioProcessor.TargetFileExtension),
-                                            track);
+                                            track.Name,
+                                            track.Playlist.Name);
 
                         _Logger.Debug(String.Format("Checking if track {0} exists locally ({1})...", track.Name, path));
                         track.ExistsLocally = File.Exists(path);
