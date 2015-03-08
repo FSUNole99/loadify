@@ -7,7 +7,6 @@ using loadify.Properties;
 using loadify.Spotify;
 using loadify.View;
 using MahApps.Metro.Controls.Dialogs;
-using SpotifySharp;
 
 namespace loadify.ViewModel
 {
@@ -59,7 +58,7 @@ namespace loadify.ViewModel
         }
 
 
-        public void Login()
+        public async void Login()
         {
             LoginProcessActive = true;
 
@@ -79,52 +78,46 @@ namespace loadify.ViewModel
                 _SettingsManager.CredentialsSetting.Password = String.Empty;
             }
 
-            _Logger.Debug(String.Format("Login triggered, trying to login with Username {0}", User.Name));
-            _Session.Login(User.Name, password, async error =>
+            var errorMessage = "";
+            try
             {
-                _Logger.Debug(String.Format("Login completed, Error: {0}", error));
-                if (error == SpotifyError.Ok)
-                {
-                    _Logger.Info(String.Format("Login successful, logged in as User {0}", User.Name));
-                    _Logger.Debug("Opening the main window...");
-                    _WindowManager.ShowWindow(new MainViewModel(_Session, _User, _EventAggregator, _WindowManager, _SettingsManager));
-                    _Logger.Debug("Main window opened. Attempting to close the login window...");
-                    loginView.Close();
-                    _Logger.Debug("Login window closed");
-                }
-                else
-                {
-                    LoginProcessActive = false;
+                _Logger.Debug(String.Format("Login triggered, trying to login with Username {0}", User.Name));
+                await _Session.Login(User.Name, password);
+                _Logger.Info(String.Format("Login successful, logged in as User {0}", User.Name));
+                _Logger.Debug("Opening the main window...");
+                _WindowManager.ShowWindow(new MainViewModel(_Session, _User, _EventAggregator, _WindowManager,
+                    _SettingsManager));
+                _Logger.Debug("Main window opened. Attempting to close the login window...");
+                loginView.Close();
+                _Logger.Debug("Login window closed");
+            }
+            catch (InvalidCredentialsException)
+            {
+                _Logger.Fatal("Login failed, wrong username or password has been entered");
+                errorMessage = Localization.Login.NameOrPasswordWrong;
+            }
+            catch (ConnectionFailedException)
+            {
+                _Logger.Fatal("Login failed, no connection to the Spotify servers could be made");
+                errorMessage = Localization.Login.NoConnectionToSpotify;
+            }
+            catch (UnauthorizedException)
+            {
+                _Logger.Fatal("Login failed, the account being used is not a Spotify premium account");
+                errorMessage = Localization.Login.NotAPremiumAccount;
+            }
+            catch (SpotifyException exception)
+            {
+                _Logger.Fatal(String.Format("Login failed due to unhandled reason: {0}", exception.Message));
+                errorMessage = Localization.Login.UnknownError;
+            }
+            finally
+            {
+                LoginProcessActive = false;
+            }
 
-                    switch (error)
-                    {
-                        case SpotifyError.BadUsernameOrPassword:
-                        {
-                            _Logger.Fatal("Login failed, wrong username or password has been entered");
-                            await loginView.ShowMessageAsync(Localization.Login.LoginFailed, Localization.Login.NameOrPasswordWrong);
-                            break;
-                        }
-                        case SpotifyError.UnableToContactServer:
-                        {
-                            _Logger.Fatal("Login failed, no connection to the Spotify servers could be made");
-                            await loginView.ShowMessageAsync(Localization.Login.LoginFailed, Localization.Login.NoConnectionToSpotify);
-                            break;
-                        }
-                        case SpotifyError.UserNeedsPremium:
-                        {
-                            _Logger.Fatal("Login failed, the account being used is not a Spotify premium account");
-                            await loginView.ShowMessageAsync(Localization.Login.LoginFailed, Localization.Login.NotAPremiumAccount);
-                            break;
-                        }
-                        default:
-                        {
-                            _Logger.Fatal(String.Format("Login failed due to unhandled reason: {0}", error));
-                            await loginView.ShowMessageAsync(Localization.Login.LoginFailed, Localization.Login.UnknownError);
-                            break;
-                        }
-                    }
-                }
-            });          
+            if (errorMessage.Length != 0)
+                await loginView.ShowMessageAsync(Localization.Login.LoginFailed, errorMessage);     
         }
 
         public void OnKeyUp(Key key)

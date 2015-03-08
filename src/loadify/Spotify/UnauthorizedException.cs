@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace loadify.Spotify
 {
-    public class ResourceException : Exception
+    public class UnauthorizedException : SpotifyException
     {
-        public ResourceException(string msg = ""):
+        public UnauthorizedException(string msg = ""):
             base(msg)
         { }
     }

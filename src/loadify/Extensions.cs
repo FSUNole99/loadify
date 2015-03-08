@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace loadify
 {
@@ -14,6 +15,11 @@ namespace loadify
         public static string ValidateFileName(this string fileName)
         {
             return !String.IsNullOrEmpty(fileName) ? Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.Replace(c.ToString(), "-")) : "";
+        }
+
+        public static void Sleep(this TimeSpan timeSpan)
+        {
+            new ManualResetEvent(false).WaitOne(timeSpan.Milliseconds);
         }
     }
 }

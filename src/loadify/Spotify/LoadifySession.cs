@@ -15,8 +15,6 @@ namespace loadify.Spotify
         private SynchronizationContext _Synchronization { get; set; }
         private TrackDownloadService _TrackDownloadService { get; set; }
 
-        private Action<SpotifyError> _LoggedInCallback = error => { };    
-
         public bool Connected
         {
             get
@@ -25,6 +23,14 @@ namespace loadify.Spotify
                 return (_Session.Connectionstate() == ConnectionState.LoggedIn);
             }
         }
+
+        public bool Ready
+        {
+            get { return Connected && _PlaylistContainer != null && _PlaylistContainer.IsLoaded(); }
+        }
+
+        private bool _LogInFailed = false;
+        private SpotifyError _LoginError;
 
         public LoadifySession()
         {
@@ -38,10 +44,7 @@ namespace loadify.Spotify
 
         public void Release()
         {
-            if (_Session == null) return;
-            _Session.Logout();
-
-
+            if (_Session == null || _PlaylistContainer == null) return;
             _PlaylistContainer.Release();
         }
 
@@ -65,17 +68,53 @@ namespace loadify.Spotify
             _Session = SpotifySession.Create(config);
         }
 
-        public void Login(string username, string password, Action<SpotifyError> callback)
+        public async Task Login(string username, string password)
         {
-            if (Connected) return;
-            _LoggedInCallback = callback;
-            _Session.Login(username, password, false, null);
+            await Task.Run(() =>
+            {
+                _LogInFailed = false;
+                
+                if (Connected) return;
+                _Session.Login(username, password, false, null);
+
+                while (true)
+                {
+                    if ( (Connected && Ready) || _LogInFailed)
+                        break;
+
+                    TimeSpan.FromMilliseconds(100).Sleep();
+                }
+
+                switch (_LoginError)
+                {
+                    case SpotifyError.Ok:
+                    {
+                        return;
+                    }
+                    case SpotifyError.BadUsernameOrPassword:
+                    {
+                        throw new InvalidCredentialsException();
+                    }
+                    case SpotifyError.UnableToContactServer:
+                    {
+                        throw new ConnectionFailedException();
+                    }
+                    case SpotifyError.UserNeedsPremium:
+                    {
+                        throw new UnauthorizedException();
+                    }
+                    default:
+                    {
+                        throw new SpotifyException();
+                    }
+                }
+            });
         }
 
         private async Task LoadPlaylistContainer()
         {
             _PlaylistContainer = _Session.Playlistcontainer();
-            if (_PlaylistContainer == null) throw new SpotifyException(SpotifyError.SystemFailure, "Playlist container could not be retrieved from the library");
+            if (_PlaylistContainer == null) throw new ResourceException("Playlist container could not be retrieved from the library");
             await SpotifyObject.WaitForInitialization(_PlaylistContainer.IsLoaded);
         }
 
@@ -201,14 +240,17 @@ namespace loadify.Spotify
 
         public override async void LoggedIn(SpotifySession session, SpotifyError error)
         {
-            if (error == SpotifyError.Ok)
+            _LoginError = error;
+
+            if (error != SpotifyError.Ok)
             {
-                await SpotifyObject.WaitForInitialization(session.User().IsLoaded);
-                _Session.PreferredBitrate(BitRate._320k);
-                await LoadPlaylistContainer();
+                _LogInFailed = true;
+                return;
             }
 
-            _LoggedInCallback(error);
+            await SpotifyObject.WaitForInitialization(session.User().IsLoaded);
+            _Session.PreferredBitrate(BitRate._320k);
+            await LoadPlaylistContainer();
         }
 
         public override int MusicDelivery(SpotifySession session, AudioFormat format, IntPtr frames, int num_frames)

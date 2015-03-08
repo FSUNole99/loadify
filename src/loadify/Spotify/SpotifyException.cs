@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using log4net.Filter;
 
 namespace loadify.Spotify
 {
-    public class ResourceException : Exception
+    public class SpotifyException : Exception
     {
-        public ResourceException(string msg = ""):
+        public SpotifyException(string msg = ""):
             base(msg)
         { }
     }

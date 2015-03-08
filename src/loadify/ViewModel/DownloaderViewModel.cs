@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms.VisualStyles;
 using Caliburn.Micro;
 using loadify.Audio;
 using loadify.Configuration;
@@ -144,17 +145,15 @@ namespace loadify.ViewModel
                         _SettingsManager.BehaviorSetting.AudioProcessor,
                         downloadFilePath)
                     {
-                        Cleanup = _SettingsManager.BehaviorSetting.CleanupAfterConversion,
-                        AudioFileDescriptor = _SettingsManager.BehaviorSetting.AudioFileDescriptor,
                         DownloadProgressUpdated = progress =>
                         {
                             TrackProgress = progress;
                         }
                     };
 
-                    _Logger.Debug(String.Format("Configured Track download service: DownloadFilePath: {0}, Cleanup? {1}, Track: {2}",
-                                                trackDownloadService.DownloadFilePath,
-                                                trackDownloadService.Cleanup ? "Yes" : "No",
+                    _Logger.Debug(String.Format("Configured download parameters: Destination: {0}, Cleanup? {1}, Track: {2}",
+                                                downloadFilePath,
+                                                _SettingsManager.BehaviorSetting.CleanupAfterConversion ? "Yes" : "No",
                                                 CurrentTrack.ToString()));
                     _Logger.Info(String.Format("Downloading {0}...", CurrentTrack.ToString()));
                     await session.DownloadTrack(trackDownloadService, _CancellationToken.Token);
@@ -231,7 +230,7 @@ namespace loadify.ViewModel
                     _EventAggregator.PublishOnUIThread(new DownloadContractPausedEvent(exception.ToString(), RemainingTracks.IndexOf(CurrentTrack)));
                     return;
                 }
-                catch (SpotifyException exception)
+                catch (Spotify.SpotifyException exception)
                 {
                     _Logger.Error("A Spotify error occured", exception);
                     _EventAggregator.PublishOnUIThread(new DownloadContractPausedEvent(String.Format("{0} could not be download because a Spotify error occured.", 

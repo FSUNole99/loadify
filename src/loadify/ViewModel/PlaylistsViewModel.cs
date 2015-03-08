@@ -275,18 +275,26 @@ namespace loadify.ViewModel
 
         public async void Handle(RemovePlaylistReplyEvent message)
         {
-            _Logger.Debug(String.Format("Removing playlist {0} from the container...", message.Playlist.Name));
+            _Logger.Debug(String.Format("Removing playlist {0} from the view container...", message.Playlist.Name));
             Playlists.Remove(message.Playlist);
             _Logger.Info(String.Format("Removed playlist {0}", message.Playlist.Name));
 
             if (message.Permanent)
             {
-                _EventAggregator.PublishOnUIThread(new DisplayProgressEvent("Removing Playlist...",
-                                                    String.Format(Localization.Playlists.RemovePlaylistProcessingDialogMessage, message.Playlist.Name)));
-                _Logger.Debug(String.Format("Removing playlist {0} permanently from the logged-in Spotify account...", message.Playlist.Name));
-                await message.Session.RemovePlaylist(message.Session.GetPlaylist(message.Playlist.Playlist.Link));
-                _Logger.Info(String.Format("Removed playlist {0} permanently from the logged-in Spotify account", message.Playlist.Name));
-                _EventAggregator.PublishOnUIThread(new HideProgressEvent());
+                try
+                {
+                    _EventAggregator.PublishOnUIThread(new DisplayProgressEvent("Removing Playlist...",
+                                                        String.Format(Localization.Playlists.RemovePlaylistProcessingDialogMessage, message.Playlist.Name)));
+                    _Logger.Debug(String.Format("Removing playlist {0} permanently from the logged-in Spotify account...", message.Playlist.Name));
+                    await message.Session.RemovePlaylist(message.Session.GetPlaylist(message.Playlist.Playlist.Link));
+                    _Logger.Info(String.Format("Removed playlist {0} permanently from the logged-in Spotify account", message.Playlist.Name));
+                    _EventAggregator.PublishOnUIThread(new HideProgressEvent());
+                }
+                catch (ResourceException)
+                {
+
+                    throw;
+                }
             }
         }
 
