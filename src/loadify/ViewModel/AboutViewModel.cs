@@ -14,7 +14,7 @@ namespace loadify.ViewModel
 
         public string Contributors
         {
-            get { return String.Join(", ", new List<string>() { "Mostey", "snowfalk13", "greensn0w" }); }
+            get { return String.Join(", ", new List<string>() { "Mostey", "snowfalk13", "greensn0w", "Kentika" }); }
         }
 
         public string Version
