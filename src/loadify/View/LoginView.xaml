@@ -10,6 +10,9 @@
                         cal:Message.Attach="[Event KeyUp] = [Action OnKeyUp($pressedkey)]"
                         FocusManager.FocusedElement="{Binding ElementName=Username}"
                         ResxExtension.DefaultResxName="loadify.Localization.Login" Language="{UICulture}">
+    <Window.Resources>
+        <BitmapImage x:Key="Banner" UriSource="../Resources/banner_logo.png"></BitmapImage>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60*"/>
@@ -33,8 +36,7 @@
         <Button x:Name="Login" Content="{Resx LogIn}" Margin="30 3" Grid.Row="5" Grid.ColumnSpan="3" TabIndex="2"/>
         <Label Grid.Column="0" Content="{Resx Username}" ContentStringFormat="{}{0}:" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Grid.Row="2"/>
         <Label Grid.Column="0" Content="{Resx Password}" ContentStringFormat="{}{0}:" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Grid.Row="3"/>
-        <Label Grid.Column="0" Content="LOADIFY " HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
-               Grid.ColumnSpan="3" FontFamily="MV Boli" FontSize="50" Grid.RowSpan="2"/>
+        <Image Source="{StaticResource Banner}" Grid.RowSpan="2" Grid.ColumnSpan="3" Height="51" Width="270"/>
         <controls:MetroProgressBar IsIndeterminate="{Binding LoginProcessActive}" Foreground="{StaticResource AccentColorBrush}" Background="Transparent" Margin="3" Grid.Row="1" Grid.ColumnSpan="3" VerticalAlignment="Stretch"/>
         <CheckBox x:Name="RememberMe" Margin="32 0" Content="{Resx RememberMe}" ToolTip="{Resx RememberMeDescription}" Grid.Row="4" Grid.ColumnSpan="2"/>
     </Grid>
