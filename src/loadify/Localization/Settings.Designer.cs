@@ -133,6 +133,15 @@ namespace loadify.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download and show playlist metadata on startup .
+        /// </summary>
+        public static string FetchPlaylistsOnStartup {
+            get {
+                return ResourceManager.GetString("FetchPlaylistsOnStartup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Management.
         /// </summary>
         public static string FileManagement {
@@ -165,6 +174,15 @@ namespace loadify.Localization {
         public static string NotifyLocalTrackDetections {
             get {
                 return ResourceManager.GetString("NotifyLocalTrackDetections", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Other.
+        /// </summary>
+        public static string Other {
+            get {
+                return ResourceManager.GetString("Other", resourceCulture);
             }
         }
         
