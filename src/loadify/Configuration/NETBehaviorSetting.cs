@@ -35,6 +35,16 @@ namespace loadify.Configuration
             }
         }
 
+        public bool FetchPlaylistsOnStartup
+        {
+            get { return Settings.Default.FetchPlaylistsOnStartup; }
+            set
+            {
+                Settings.Default.FetchPlaylistsOnStartup = value;
+                Settings.Default.Save();
+            }
+        }
+
         public AudioProcessor AudioProcessor { get; set; }
         public AudioConverter AudioConverter { get; set; }
         public IAudioFileDescriptor AudioFileDescriptor { get; set; }
