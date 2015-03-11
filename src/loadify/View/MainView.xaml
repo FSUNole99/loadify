@@ -28,8 +28,8 @@
             <ContentControl x:Name="Playlists" Margin="3 0"/>
             <Grid Grid.Row="1" Grid.Column="2">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="326*"/>
-                    <RowDefinition Height="47*"/>
+                    <RowDefinition Height="343*"/>
+                    <RowDefinition Height="37*"/>
                 </Grid.RowDefinitions>
                 <ContentControl x:Name="Settings"/>
                 <Grid Grid.Row="1" Margin="10 0">
@@ -38,8 +38,8 @@
                         <ColumnDefinition Width="Auto" MinWidth="130"/>
                         <ColumnDefinition Width="324*"/>
                     </Grid.ColumnDefinitions>
-                    <Button x:Name="StartDownload" Content="{Resx Download}" Margin="5 10"/>
-                    <Button x:Name="CancelDownload" Content="{Resx CancelDownload}" Margin="5 10" Grid.Column="1"/>
+                    <Button x:Name="StartDownload" Content="{Resx Download}" Margin="5"/>
+                    <Button x:Name="CancelDownload" Content="{Resx CancelDownload}" Margin="5" Grid.Column="1"/>
                 </Grid>
             </Grid>
         </Grid>

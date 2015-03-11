@@ -140,10 +140,64 @@ namespace loadify.ViewModel
             _EventAggregator.PublishOnUIThread(new DownloadContractCancelledEvent());
         }
 
-        protected override void OnViewLoaded(object view)
+        protected async override void OnViewLoaded(object view)
         {
-            _Logger.Debug("Main window was loaded. Broadcasting the data update event...");
-            _EventAggregator.PublishOnUIThread(new DataRefreshAuthorizedEvent(_Session));
+            _Logger.Debug("Main window was loaded");
+
+            // if the user logged into Loadify for the first time
+            if (_SettingsManager.InternalSetting.FirstUsage)
+            {
+                _SettingsManager.InternalSetting.FirstUsage = false;
+                _Logger.Debug("Detected the first startup of Loadify");
+
+                // ask for retrieving the playlist metadata now
+                _Logger.Debug("Prompting the user whether or not he wants to refresh his playlists...");
+                var refreshNowDialogResult = await (view as MainView).ShowMessageAsync(Localization.Main.RefreshPlaylistsDialogTitle,
+                                                                Localization.Main.RefreshPlaylistDialogMessage,
+                                                                MessageDialogStyle.AffirmativeAndNegative,
+                                                                new MetroDialogSettings()
+                                                                {
+                                                                    AffirmativeButtonText = Localization.Common.Yes,
+                                                                    NegativeButtonText = Localization.Common.No
+                                                                });
+
+                // ask if the FetchPlaylistsOnStartup setting should be enabled 
+                var enableSettingDialogResult = await (view as MainView).ShowMessageAsync(Localization.Main.EnableFetchPlaylistsOnStartupDialogTitle,
+                                                                        Localization.Main.EnableFetchPlaylistsOnStartupDialogMessage,
+                                                                        MessageDialogStyle.AffirmativeAndNegative,
+                                                                        new MetroDialogSettings()
+                                                                        {
+                                                                            AffirmativeButtonText = Localization.Common.Yes,
+                                                                            NegativeButtonText = Localization.Common.No
+                                                                        });
+                if (enableSettingDialogResult == MessageDialogResult.Affirmative)
+                {
+                    _Settings.FetchPlaylistsOnStartup = true;
+                    _Logger.Debug("User wants to update all playlist metadata on every startup (FetchPlaylistsOnStartup setting enabled)");
+                }
+                else
+                {
+                    _Settings.FetchPlaylistsOnStartup = false;
+                    _Logger.Debug("User does not want to update all playlist metadata on every startup (FetchPlaylistsOnStartup setting disabled)");
+                }
+
+                if (refreshNowDialogResult == MessageDialogResult.Affirmative)
+                {
+                    _Logger.Debug("User confirmed the playlist refresh, broadcasting the data refresh event...");
+                    _EventAggregator.PublishOnUIThread(new DataRefreshRequestEvent());
+                }
+                else
+                {
+                    _Logger.Debug("User declined the playlist refresh");
+                }
+
+            }
+            // otherwise check if the user enabled the setting for downloading playlist metadata on startup
+            else if (_SettingsManager.BehaviorSetting.FetchPlaylistsOnStartup)
+            {
+                _Logger.Debug("FetchPlaylistsOnStartup is enabled, requesting the data update...");
+                _EventAggregator.PublishOnUIThread(new DataRefreshRequestEvent());
+            }
         }
 
         public void Handle(DataRefreshRequestEvent message)

@@ -141,6 +141,9 @@
   <data name="DownloadDirectoryInfo" xml:space="preserve">
     <value>Verzeichnis in dem die heruntergeladenen Tracks gespeichert werden</value>
   </data>
+  <data name="FetchPlaylistsOnStartup" xml:space="preserve">
+    <value>Nach dem Start automatisch Playlist Informationen herunterladen und anzeigen</value>
+  </data>
   <data name="FileManagement" xml:space="preserve">
     <value>Dateiverwaltung</value>
   </data>
@@ -152,6 +155,9 @@
   </data>
   <data name="NotifyLocalTrackDetections" xml:space="preserve">
     <value>Mich fragen wenn sich zum Download ausgewählte Tracks bereits im Download Verzeichnis befinden</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Sonstiges</value>
   </data>
   <data name="SkipOnDownloadFailures" xml:space="preserve">
     <value>Automatisch den Download von Tracks überspringen, wenn diese nicht heruntergeladen werden können</value>
