@@ -142,8 +142,13 @@ namespace loadify.ViewModel
 
         protected override void OnViewLoaded(object view)
         {
-            _Logger.Debug("Main window was loaded. Broadcasting the data update event...");
-            _EventAggregator.PublishOnUIThread(new DataRefreshAuthorizedEvent(_Session));
+            _Logger.Debug("Main window was loaded");
+
+            if (Settings.FetchPlaylistsOnStartup)
+            {
+                _Logger.Debug("FetchPlaylistsOnStartup is enabled, requesting the data update...");
+                _EventAggregator.PublishOnUIThread(new DataRefreshRequestEvent());
+            }
         }
 
         public void Handle(DataRefreshRequestEvent message)
