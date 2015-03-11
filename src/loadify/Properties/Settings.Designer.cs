@@ -130,5 +130,17 @@ namespace loadify.Properties {
                 this["FetchPlaylistsOnStartup"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool FirstUsage {
+            get {
+                return ((bool)(this["FirstUsage"]));
+            }
+            set {
+                this["FirstUsage"] = value;
+            }
+        }
     }
 }

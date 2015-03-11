@@ -144,7 +144,14 @@ namespace loadify.ViewModel
         {
             _Logger.Debug("Main window was loaded");
 
-            if (Settings.FetchPlaylistsOnStartup)
+            if (_SettingsManager.InternalSetting.FirstUsage)
+            {
+                _Logger.Debug("Detected the first startup of Loadify");
+                // ask for retrieving the playlists automatically
+                _SettingsManager.InternalSetting.FirstUsage = false;
+            }
+
+            if (_SettingsManager.BehaviorSetting.FetchPlaylistsOnStartup)
             {
                 _Logger.Debug("FetchPlaylistsOnStartup is enabled, requesting the data update...");
                 _EventAggregator.PublishOnUIThread(new DataRefreshRequestEvent());

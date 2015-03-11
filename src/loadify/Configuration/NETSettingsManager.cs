@@ -8,6 +8,7 @@ namespace loadify.Configuration
         public IBehaviorSetting BehaviorSetting { get; set; }
         public ICredentialsSetting CredentialsSetting { get; set; }
         public ILocalizationSetting LocalizationSetting { get; set; }
+        public IInternalSetting InternalSetting { get; set; }
 
         public NETSettingsManager()
         {
@@ -15,6 +16,7 @@ namespace loadify.Configuration
             BehaviorSetting = new NETBehaviorSetting();
             CredentialsSetting = new NETCredentialsSetting();
             LocalizationSetting = new NETLocalizationSetting();
+            InternalSetting = new NETInternalSetting();
         }
     }
 }
