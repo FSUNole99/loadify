@@ -157,6 +157,15 @@ Möchtest du diese Tracks abwählen?</value>
   <data name="ExistingTracksRemovalDialogTitle" xml:space="preserve">
     <value>Existierende Tracks erkannt</value>
   </data>
+  <data name="FirstUsageDetection" xml:space="preserve">
+    <value>Es sieht so aus, als ob du Loadify zum ersten Mal benutzt.</value>
+  </data>
+  <data name="RefreshPlaylistDialogMessage" xml:space="preserve">
+    <value>Möchtest du jetzt die Playlistinformationen aktualisieren/laden?</value>
+  </data>
+  <data name="RefreshPlaylistsDialogTitle" xml:space="preserve">
+    <value>Playlists aktualisieren</value>
+  </data>
   <data name="RemovePlaylistConfirmationDialogMessage" xml:space="preserve">
     <value>Möchtest du diese Playlist permanent von deinem Account entfernen?</value>
   </data>

@@ -179,6 +179,33 @@ namespace loadify.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to It seems that you are using Loadify for the first time..
+        /// </summary>
+        public static string FirstUsageDetection {
+            get {
+                return ResourceManager.GetString("FirstUsageDetection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to refresh/load your playlist metadata?.
+        /// </summary>
+        public static string RefreshPlaylistDialogMessage {
+            get {
+                return ResourceManager.GetString("RefreshPlaylistDialogMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refreshing Playlists.
+        /// </summary>
+        public static string RefreshPlaylistsDialogTitle {
+            get {
+                return ResourceManager.GetString("RefreshPlaylistsDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you want to permanently remove this playlist from your account?.
         /// </summary>
         public static string RemovePlaylistConfirmationDialogMessage {
