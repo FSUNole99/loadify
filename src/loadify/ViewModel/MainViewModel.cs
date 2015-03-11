@@ -21,8 +21,7 @@ namespace loadify.ViewModel
                                                 IHandle<DisplayProgressEvent>,
                                                 IHandle<HideProgressEvent>,
                                                 IHandle<UnselectExistingTracksRequestEvent>,
-                                                IHandle<RemovePlaylistRequestEvent>,
-                                                IHandle<RefreshPlaylistsRequestEvent>
+                                                IHandle<RemovePlaylistRequestEvent>
     {
         private readonly LoadifySession _Session;
 
@@ -141,18 +140,59 @@ namespace loadify.ViewModel
             _EventAggregator.PublishOnUIThread(new DownloadContractCancelledEvent());
         }
 
-        protected override void OnViewLoaded(object view)
+        protected async override void OnViewLoaded(object view)
         {
             _Logger.Debug("Main window was loaded");
 
+            // if the user logged into Loadify for the first time
             if (_SettingsManager.InternalSetting.FirstUsage)
             {
-                _Logger.Debug("Detected the first startup of Loadify");
-                // ask for retrieving the playlists automatically
-                _EventAggregator.PublishOnUIThread(new RefreshPlaylistsRequestEvent(Localization.Main.FirstUsageDetection));
-                _Logger.Debug("Prompted the user whether or not he wants to refresh his playlists");
                 _SettingsManager.InternalSetting.FirstUsage = false;
+                _Logger.Debug("Detected the first startup of Loadify");
+
+                // ask for retrieving the playlist metadata now
+                _Logger.Debug("Prompting the user whether or not he wants to refresh his playlists...");
+                var refreshNowDialogResult = await (view as MainView).ShowMessageAsync(Localization.Main.RefreshPlaylistsDialogTitle,
+                                                                Localization.Main.RefreshPlaylistDialogMessage,
+                                                                MessageDialogStyle.AffirmativeAndNegative,
+                                                                new MetroDialogSettings()
+                                                                {
+                                                                    AffirmativeButtonText = Localization.Common.Yes,
+                                                                    NegativeButtonText = Localization.Common.No
+                                                                });
+
+                // ask if the FetchPlaylistsOnStartup setting should be enabled 
+                var enableSettingDialogResult = await (view as MainView).ShowMessageAsync(Localization.Main.EnableFetchPlaylistsOnStartupDialogTitle,
+                                                                        Localization.Main.EnableFetchPlaylistsOnStartupDialogMessage,
+                                                                        MessageDialogStyle.AffirmativeAndNegative,
+                                                                        new MetroDialogSettings()
+                                                                        {
+                                                                            AffirmativeButtonText = Localization.Common.Yes,
+                                                                            NegativeButtonText = Localization.Common.No
+                                                                        });
+                if (enableSettingDialogResult == MessageDialogResult.Affirmative)
+                {
+                    _Settings.FetchPlaylistsOnStartup = true;
+                    _Logger.Debug("User wants to update all playlist metadata on every startup (FetchPlaylistsOnStartup setting enabled)");
+                }
+                else
+                {
+                    _Settings.FetchPlaylistsOnStartup = false;
+                    _Logger.Debug("User does not want to update all playlist metadata on every startup (FetchPlaylistsOnStartup setting disabled)");
+                }
+
+                if (refreshNowDialogResult == MessageDialogResult.Affirmative)
+                {
+                    _Logger.Debug("User confirmed the playlist refresh, broadcasting the data refresh event...");
+                    _EventAggregator.PublishOnUIThread(new DataRefreshRequestEvent());
+                }
+                else
+                {
+                    _Logger.Debug("User declined the playlist refresh");
+                }
+
             }
+            // otherwise check if the user enabled the setting for downloading playlist metadata on startup
             else if (_SettingsManager.BehaviorSetting.FetchPlaylistsOnStartup)
             {
                 _Logger.Debug("FetchPlaylistsOnStartup is enabled, requesting the data update...");
@@ -335,31 +375,6 @@ namespace loadify.ViewModel
                         : String.Format("Playlist {0} won't be removed permanently from the logged-in Spotify account",
                             message.Playlist.Name));
             _EventAggregator.PublishOnUIThread(new RemovePlaylistReplyEvent(_Session, message.Playlist, dialogResult == MessageDialogResult.Affirmative));
-        }
-
-        public async void Handle(RefreshPlaylistsRequestEvent message)
-        {
-            _Logger.Debug(String.Format("Showing the playlist refresh confirmation dialog (Text: {0})...", message.Text));
-            var view = GetView() as MainView;
-            var dialogResult = await view.ShowMessageAsync(Localization.Main.RefreshPlaylistsDialogTitle,
-                                                            message.Text 
-                                                            + Environment.NewLine
-                                                            + Localization.Main.RefreshPlaylistDialogMessage,
-                                                            MessageDialogStyle.AffirmativeAndNegative,
-                                                            new MetroDialogSettings()
-                                                            {
-                                                                AffirmativeButtonText = Localization.Common.Yes,
-                                                                NegativeButtonText = Localization.Common.No
-                                                            });
-            if (dialogResult == MessageDialogResult.Affirmative)
-            {
-                _Logger.Debug("User confirmed the playlist refresh, broadcasting the data refresh event...");
-                _EventAggregator.PublishOnUIThread(new DataRefreshRequestEvent());
-            }
-            else
-            {
-                _Logger.Debug("User declined the playlist refresh");
-            }
         }
     }
 }
