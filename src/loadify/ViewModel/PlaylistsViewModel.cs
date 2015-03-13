@@ -183,7 +183,7 @@ namespace loadify.ViewModel
             var invalidUrlEvent = new NotificationEvent(Localization.Common.Error,
                                                         String.Format(Localization.Playlists.AddPlaylistInvalidLinkDialogMessage, message.Content));
             if (!Regex.IsMatch(message.Content,
-                @"((?:(?:http|https)://open.spotify.com/user/[a-zA-Z0-9]+/playlist/[a-zA-Z0-9]+)|(?:spotify:user:[a-zA-Z0-9]+:playlist:[a-zA-Z0-9]+))"))
+                @"((?:(?:http|https)://open.spotify.com/user/[^ ]+/playlist/[a-zA-Z0-9]+)|(?:spotify:user:[^ ]+:playlist:[a-zA-Z0-9]+))"))
             {
                 _Logger.Info("Loadify detected that the playlist link entered is not a valid Spotify playlist link");
                 _EventAggregator.PublishOnUIThread(invalidUrlEvent);

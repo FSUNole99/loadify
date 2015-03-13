@@ -204,6 +204,8 @@ namespace loadify.Spotify
 
         public Playlist GetPlaylist(string url)
         {
+            // make sure the url is not using the https protocol since the underlying library can't handle https
+            url = Extensions.HTTPSToHTTP(url); 
             var link = Link.CreateFromString(url);
             if (link == null) throw new InvalidSpotifyUrlException(url);
             return GetPlaylist(link);
@@ -211,6 +213,8 @@ namespace loadify.Spotify
 
         public Track GetTrack(string url)
         {
+            // make sure the url is not using the https protocol since the underlying library can't handle https
+            url = Extensions.HTTPSToHTTP(url); 
             var link = Link.CreateFromString(url);
             if (link == null) throw new InvalidSpotifyUrlException(url);
 

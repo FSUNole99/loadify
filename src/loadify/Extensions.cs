@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace loadify
@@ -15,6 +16,11 @@ namespace loadify
         public static void Sleep(this TimeSpan timeSpan)
         {
             new ManualResetEvent(false).WaitOne(timeSpan.Milliseconds);
+        }
+
+        public static string HTTPSToHTTP(string url)
+        {
+            return Regex.Replace(url, "https://", "http://");
         }
     }
 }
