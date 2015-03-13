@@ -49,16 +49,13 @@ After logging in, a new window containing your dashboard will open up. The softw
 
 <a href="url"><img src="http://i.epvpimg.com/hWPYc.png" align="center" height="100%" width="700" ></a>
 
-<a href="url"><img src="http://i.epvpimg.com/vTMZd.png" align="center" height="100%" width="700" ></a>
-
 The right pane is mainly used for configuration and settings. You may (currently) specify:
 * where to store downloaded tracks
 * where to store cache files for speeding up the login/playlist fetching process
 
 Once you've selected some tracks (or whole playlists) for downloading, the `Download` button will be enabled that triggers the download contract once it has been clicked.
 
-<a href="url"><img src="http://i.epvpimg.com/dRiYg.jpg" align="center" height="100%" width="700" ></a>
-
+<a href="url"><img src="http://i.epvpimg.com/vTMZd.png" align="center" height="100%" width="700" ></a>
 
 ***
 
@@ -79,7 +76,7 @@ Once you expand a playlist in the left pane, all associated tracks will be liste
 
 If you hover over the tracks, a tooltip will display the track duration.
 
-<a href="url"><img src="http://i.epvpimg.com/kEbzf.png" align="center" height="100%" width="250"></a>
+<a href="url"><img src="http://i.epvpimg.com/kEbzf.png" align="center"></a>
 
 Each time you select a track, the software calculates the approximate time that is needed for downloading all of the selected tracks. The estimated time is displayed below the playlist/track listings.
 
@@ -123,7 +120,7 @@ Typing in __Eminem__ for example, will display all tracks that got the word __Em
 
 Pressing enter will apply the search filter, removing the search text and pressing enter again will restore all playlists without the search filter.
 
-<a href="url"><img src="http://i.epvpimg.com/Jruih.png" align="center" height="100%" width="300"></a>
+<a href="url"><img src="http://i.epvpimg.com/Jruih.png" align="center"></a>
 
 
 ***
@@ -134,7 +131,7 @@ If you want to download playlists/tracks that you've not added to your spotify a
 #### Playlists
 Right click in an empty area of the panel where the playlists and tracks are shown and select __Add Playlist__
 
-<a href="url"><img src="http://i.epvpimg.com/bXmhd.png" align="center" height="100%" width="350"></a>
+<a href="url"><img src="http://i.epvpimg.com/bXmhd.png" align="center"></a>
 
 A dialog will be displayed, prompting you to enter the link to the playlist you want to add. There are 2 types of playlist links:
 * HTTP links (example: __http://open.spotify.com/user/spotify_germany/playlist/0QUQf1xMMbtArIbDjwi2Hf__)
@@ -155,7 +152,7 @@ Once you refresh your playlists, it will be removed if you choose to not permane
 #### Tracks
 For adding single tracks into an existing playlist, you need to right click one of the playlists and select __Add Track__.
 
-<a href="url"><img src="http://i.epvpimg.com/VCQof.png" align="center" height="100%" width="350"></a>
+<a href="url"><img src="http://i.epvpimg.com/VCQof.png" align="center"></a>
 
 This is basically following the same procedure as the __Add Playlist__ feature explained earlier. The only difference lies in the urls.
 
