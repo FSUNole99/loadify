@@ -49,13 +49,37 @@ After logging in, a new window containing your dashboard will open up. The softw
 
 <a href="url"><img src="http://i.epvpimg.com/hWPYc.png" align="center" height="100%" width="700" ></a>
 
-The right pane is mainly used for configuration and settings. You may (currently) specify:
-* where to store downloaded tracks
-* where to store cache files for speeding up the login/playlist fetching process
+The right pane is mainly used for configuration and settings, see the next section for detailed explanations of the available settings.
 
 Once you've selected some tracks (or whole playlists) for downloading, the `Download` button will be enabled that triggers the download contract once it has been clicked.
 
 <a href="url"><img src="http://i.epvpimg.com/vTMZd.png" align="center" height="100%" width="700" ></a>
+
+***
+
+### Settings
+
+There are currently multiple settings implemented that can be used to customize Loadify:
+
+#### Directories
+* **Download Directory** - Base directory in which downloaded tracks will be stored
+* **Cache Directory** - Directory in which cache files for speeding up the login/playlist fetching process are stored
+
+#### Behavior
+* **Local Track Detection**
+  * **Ask me for removing tracks that were detected to be already downloaded** - If you select whole playlists, Loadify will ask you whether you want to remove the selection of those tracks you've already downloaded
+* **File Management**
+  * **Remove uncompressed audio files after they were converted** - After downloading, the uncompressed audio file is usually converted and then deleted. If this setting is unchecked, the uncompressed audio file will not be deleted
+* **Download**
+  * **Skip tracks that can not be downloaded automatically** - Sometimes tracks can't be downloaded due to unknown reasons, the official Spotify bridge does not provide any information about this incident but in case this happens, Loadify will continue downloading the next track automatically instead of showing the dialog asking what to do.
+* **Other**
+  * **Download and show playlist metadata on startup** - If checked, Loadify will download playlist metadata (such as name, tracks, artists etc) and displays them in the left panel of the dashboard. You can, however, refresh/load this data any time by right-clicking the left panel and clicking __Refresh__.
+
+#### Language
+* User Interface Language - Pretty much does what you expect. Implemented languages:
+  * English
+  * German
+
 
 ***
 
