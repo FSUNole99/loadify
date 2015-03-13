@@ -15,9 +15,9 @@ namespace loadify.Configuration
             return !String.IsNullOrEmpty(fileName) ? Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.Replace(c.ToString(), "-")) : "";
         }
 
-        public string Configure(string basePath, string targetFileExtension, TrackModel track)
+        public string Configure(string basePath, string targetFileExtension, string trackName, string playlistName)
         {
-            var validatedTrackName = ValidateFileName(track.Name);
+            var validatedTrackName = ValidateFileName(trackName);
             var completePath = Path.Combine(basePath, String.Format("{0}.{1}", validatedTrackName, targetFileExtension));
 
             var maxPathField = typeof(Path).GetField("MaxPath",
@@ -27,35 +27,35 @@ namespace loadify.Configuration
 
             var maxPathLength = (int) maxPathField.GetValue(null);
 
-            if (track.Playlist != null && track.Playlist.Name.Length != 0)
+            if (playlistName.Length != 0)
             {
-                var playlistRepositoryDirectory = Path.Combine(basePath, ValidateFileName(track.Playlist.Name));
+                var playlistRepositoryDirectory = Path.Combine(basePath, ValidateFileName(playlistName));
                 if (Path.Combine(playlistRepositoryDirectory, validatedTrackName).Length <= maxPathLength)
                 {
-                    completePath = Path.Combine(playlistRepositoryDirectory, 
-                        String.Format("{0}.{1}", ValidateFileName(track.Name), targetFileExtension));
+                    completePath = Path.Combine(playlistRepositoryDirectory,
+                        String.Format("{0}.{1}", ValidateFileName(trackName), targetFileExtension));
 
-                    try
-                    {
-                        if (!Directory.Exists(playlistRepositoryDirectory))
-                            Directory.CreateDirectory(playlistRepositoryDirectory);
-                    }
-                    catch (UnauthorizedAccessException exception)
-                    {
+            try
+            {
+                if (!Directory.Exists(playlistRepositoryDirectory))
+                    Directory.CreateDirectory(playlistRepositoryDirectory);
+            }
+            catch (UnauthorizedAccessException exception)
+            {
                         throw new ConfigurationException(
                             String.Format("Loadify is not authorized to create the download directory ({0})",
                                 playlistRepositoryDirectory), exception);
-                    }
-                    catch (Exception exception)
-                    {
-                        throw new ConfigurationException("An unhandled configuration error occured", exception);
-                    }
+            }
+            catch (Exception exception)
+            {
+                throw new ConfigurationException("An unhandled configuration error occured", exception);
+            }
                 }
             }
 
             if(completePath.Length > maxPathLength)
                 throw new ConfigurationException(String.Format("The path for track {0} exceeds the maximum path length. " +
-                                                               "Please choose another download directory with a shorter path", track.Name));
+                                                               "Please choose another download directory with a shorter path", trackName));
 
             return completePath;
         }

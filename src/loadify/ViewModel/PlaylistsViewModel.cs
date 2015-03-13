@@ -151,8 +151,7 @@ namespace loadify.ViewModel
             _Logger.Info("Retrieving playlists of the logged-in Spotify user...");
             _EventAggregator.PublishOnUIThread(new DisplayProgressEvent(Localization.Playlists.RetrievingPlaylistsDialogTitle,
                                                                         Localization.Playlists.RetrievingPlaylistsDialogMessage));
-            var playlistCollection = await message.Session.GetPlaylistCollection();
-            var playlists = new List<Playlist>(await playlistCollection.GetPlaylists());
+            var playlists = new List<Playlist>(await message.Session.GetPlaylists());
 
             _Logger.Debug(String.Format("{0} playlists were retrieved from the playlist container", playlists.Count));
             _Logger.Debug("Fetching playlists and applying them to the collection...");
@@ -160,10 +159,11 @@ namespace loadify.ViewModel
             Playlists = new ObservableCollection<PlaylistViewModel>();
             foreach (var playlist in playlists)
             {
-                var fetchedPlaylistViewModel = new PlaylistViewModel(await PlaylistModel.FromLibrary(playlist, message.Session),
+                var fetchedPlaylistViewModel = new PlaylistViewModel(await PlaylistModel.FromLibrary(playlist),
                                                                     _EventAggregator, _SettingsManager);     
                 Playlists.Add(fetchedPlaylistViewModel);
                 _Logger.Info(String.Format("Added playlist {0} ({1} tracks)", fetchedPlaylistViewModel.Name, fetchedPlaylistViewModel.Tracks.Count));
+                playlist.Release();
             }
 
             _Logger.Info("Retrieving playlists finished");
@@ -195,15 +195,16 @@ namespace loadify.ViewModel
                     _EventAggregator.PublishOnUIThread(new DisplayProgressEvent("Adding Playlist...",
                                                                                 Localization.Playlists.AddPlaylistProcessingDialogMessage));
                     _Logger.Debug(String.Format("Resolving playlist link {0}...", message.Content));
-                    var playlist = await PlaylistModel.FromLibrary(message.Session.GetPlaylist(message.Content), message.Session);
+                    var unmanagedPlaylist = message.Session.GetPlaylist(message.Content);
+                    var playlist = await PlaylistModel.FromLibrary(unmanagedPlaylist);
+                    unmanagedPlaylist.Release();
                     _Logger.Info(String.Format("Playlist {0} ({1} tracks) was resolved and added to the playlist collection", playlist.Name, playlist.Tracks.Count));
                     Playlists.Add(new PlaylistViewModel(playlist, _EventAggregator, _SettingsManager));
 
                     if (message.Permanent)
                     {
-                        var playlistCollection = await message.Session.GetPlaylistCollection();
                         _Logger.Debug(String.Format("Adding playlist {0} permanently to the logged-in Spotify account...", playlist.Name));
-                        await playlistCollection.Add(playlist.UnmanagedPlaylist);
+                        message.Session.AddPlaylist(message.Session.GetPlaylist(playlist.Link));
                         _Logger.Info(String.Format("Playlist {0} was added permanently to the logged-in Spotify account", playlist.Name));
                     }
 
@@ -236,7 +237,9 @@ namespace loadify.ViewModel
                     _EventAggregator.PublishOnUIThread(new DisplayProgressEvent("Adding Track...",
                                                         String.Format(Localization.Playlists.AddTrackProcessingDialogMessage, message.Playlist.Name)));
                     _Logger.Debug(String.Format("Resolving track link {0}...", message.Content));
-                    var track = await TrackModel.FromLibrary(message.Session.GetTrack(message.Content), message.Session);
+                    var unmanagedTrack = message.Session.GetTrack(message.Content);
+                    var track = await TrackModel.FromLibrary(message.Session.GetTrack(message.Content));
+                    unmanagedTrack.Release();
                     track.Playlist = message.Playlist.Playlist;
                     _Logger.Info(String.Format("Track {0} was resolved and added to playlist {1}", track.Name, track.Playlist.Name));
                     message.Playlist.Tracks.Add(new TrackViewModel(track, _EventAggregator, _SettingsManager));
@@ -272,19 +275,26 @@ namespace loadify.ViewModel
 
         public async void Handle(RemovePlaylistReplyEvent message)
         {
-            _Logger.Debug(String.Format("Removing playlist {0} from the container...", message.Playlist.Name));
+            _Logger.Debug(String.Format("Removing playlist {0} from the view container...", message.Playlist.Name));
             Playlists.Remove(message.Playlist);
             _Logger.Info(String.Format("Removed playlist {0}", message.Playlist.Name));
 
             if (message.Permanent)
             {
-                _EventAggregator.PublishOnUIThread(new DisplayProgressEvent("Removing Playlist...",
-                                                    String.Format(Localization.Playlists.RemovePlaylistProcessingDialogMessage, message.Playlist.Name)));
-                _Logger.Debug(String.Format("Removing playlist {0} permanently from the logged-in Spotify account...", message.Playlist.Name));
-                var playlistCollection = await message.Session.GetPlaylistCollection();
-                await playlistCollection.Remove(message.Playlist.Playlist.UnmanagedPlaylist);
-                _Logger.Info(String.Format("Removed playlist {0} permanently from the logged-in Spotify account", message.Playlist.Name));
-                _EventAggregator.PublishOnUIThread(new HideProgressEvent());
+                try
+                {
+                    _EventAggregator.PublishOnUIThread(new DisplayProgressEvent("Removing Playlist...",
+                                                        String.Format(Localization.Playlists.RemovePlaylistProcessingDialogMessage, message.Playlist.Name)));
+                    _Logger.Debug(String.Format("Removing playlist {0} permanently from the logged-in Spotify account...", message.Playlist.Name));
+                    await message.Session.RemovePlaylist(message.Session.GetPlaylist(message.Playlist.Playlist.Link));
+                    _Logger.Info(String.Format("Removed playlist {0} permanently from the logged-in Spotify account", message.Playlist.Name));
+                    _EventAggregator.PublishOnUIThread(new HideProgressEvent());
+                }
+                catch (ResourceException)
+                {
+
+                    throw;
+                }
             }
         }
 

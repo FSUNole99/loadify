@@ -13,31 +13,7 @@ namespace loadify.Spotify
             UnmanagedPlaylistContainer = playlistContainer;
         }
 
-        public async Task Add(Playlist playlist)
-        {
-            if (UnmanagedPlaylistContainer == null) return;
-            await SpotifyObject.WaitForInitialization(UnmanagedPlaylistContainer.IsLoaded);
-            UnmanagedPlaylistContainer.AddPlaylist(Link.CreateFromPlaylist(playlist));
-        }
-
-        public async Task Remove(Playlist playlist)
-        {
-            if (UnmanagedPlaylistContainer == null) return;
-            await SpotifyObject.WaitForInitialization(UnmanagedPlaylistContainer.IsLoaded);
-
-            for (int i = 0; i < UnmanagedPlaylistContainer.NumPlaylists(); i++)
-            {
-                var unmanagedPlaylist = UnmanagedPlaylistContainer.Playlist(i);
-                await SpotifyObject.WaitForInitialization(unmanagedPlaylist.IsLoaded);
-
-                if (unmanagedPlaylist.Name() == playlist.Name())
-                {
-                    UnmanagedPlaylistContainer.RemovePlaylist(i);
-                    break;
-                }
-            }
-        }
-
+        
         public async Task<IEnumerable<Playlist>> GetPlaylists()
         {
             var playlists = new List<Playlist>();

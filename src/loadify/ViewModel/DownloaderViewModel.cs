@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms.VisualStyles;
 using Caliburn.Micro;
 using loadify.Audio;
 using loadify.Configuration;
@@ -130,34 +131,33 @@ namespace loadify.ViewModel
 
                 try
                 {
-                    var trackDownloadService = new TrackDownloadService(CurrentTrack.Track,
+                    var spotifyTrack = session.GetTrack(CurrentTrack.Track.Link);
+                    await SpotifyObject.WaitForInitialization(spotifyTrack.IsLoaded);
+
+                    var downloadFilePath = _SettingsManager.BehaviorSetting.DownloadPathConfigurator.Configure(
+                        _SettingsManager.DirectorySetting.DownloadDirectory,
+                        _SettingsManager.BehaviorSetting.AudioProcessor.TargetFileExtension,
+                        track.Name,
+                        track.Track.Playlist.Name);
+
+                    var trackDownloadService = new TrackDownloadService(
+                        spotifyTrack,
                         _SettingsManager.BehaviorSetting.AudioProcessor,
-                        _SettingsManager.BehaviorSetting.DownloadPathConfigurator)
+                        downloadFilePath)
                     {
-                        Cleanup = _SettingsManager.BehaviorSetting.CleanupAfterConversion,
-                        OutputDirectory = _SettingsManager.DirectorySetting.DownloadDirectory,
-                        AudioConverter = _SettingsManager.BehaviorSetting.AudioConverter,
-                        AudioFileDescriptor = _SettingsManager.BehaviorSetting.AudioFileDescriptor,
-                        Mp3MetaData = new Mp3MetaData()
-                        {
-                            Title = CurrentTrack.Name,
-                            Artists = CurrentTrack.Artists.Select(artist => artist.Name),
-                            Album = CurrentTrack.Album.Name,
-                            Year = CurrentTrack.Album.ReleaseYear,
-                            Cover = CurrentTrack.Album.Cover
-                        },
                         DownloadProgressUpdated = progress =>
                         {
                             TrackProgress = progress;
                         }
                     };
 
-                    _Logger.Debug(String.Format("Configured Track download service: OutputDirectory {0}, Cleanup? {1}, Track: {2}",
-                                                trackDownloadService.OutputDirectory,
-                                                trackDownloadService.Cleanup ? "Yes" : "No",
+                    _Logger.Debug(String.Format("Configured download parameters: Destination: {0}, Cleanup? {1}, Track: {2}",
+                                                downloadFilePath,
+                                                _SettingsManager.BehaviorSetting.CleanupAfterConversion ? "Yes" : "No",
                                                 CurrentTrack.ToString()));
                     _Logger.Info(String.Format("Downloading {0}...", CurrentTrack.ToString()));
                     await session.DownloadTrack(trackDownloadService, _CancellationToken.Token);
+                    spotifyTrack.Release();
                     _Logger.Debug(String.Format("Track downloaded with result: {0}", trackDownloadService.Cancellation.ToString()));
 
                     if (trackDownloadService.Cancellation == TrackDownloadService.CancellationReason.UserInteraction)
@@ -176,7 +176,43 @@ namespace loadify.ViewModel
                         DownloadedTracks.Add(CurrentTrack);
                         RemainingTracks.Remove(CurrentTrack);
                         _EventAggregator.PublishOnUIThread(new TrackDownloadComplete(CurrentTrack));
-                        _Logger.Info(String.Format("{0} was successfully downloaded to directory {1}", CurrentTrack.ToString(), trackDownloadService.OutputDirectory));
+                        _Logger.Info(String.Format("{0} was successfully downloaded to directory {1}", CurrentTrack.ToString(), trackDownloadService.DownloadFilePath));
+
+                        if (_SettingsManager.BehaviorSetting.AudioConverter != null)
+                        {
+                            var converterFilePath = _SettingsManager.BehaviorSetting.DownloadPathConfigurator.Configure(
+                                   _SettingsManager.DirectorySetting.DownloadDirectory,
+                                   _SettingsManager.BehaviorSetting.AudioConverter.TargetFileExtension,
+                                   track.Name,
+                                   track.Track.Playlist.Name);
+
+                            _SettingsManager.BehaviorSetting.AudioConverter.Convert(
+                                downloadFilePath, converterFilePath);
+
+                            if (_SettingsManager.BehaviorSetting.CleanupAfterConversion && File.Exists(downloadFilePath))
+                                File.Delete(downloadFilePath);
+
+                            downloadFilePath = converterFilePath;
+                        }
+
+                        if (_SettingsManager.BehaviorSetting.AudioFileDescriptor != null)
+                        {
+                            var coverImage = session.GetImage(CurrentTrack.Album.CoverImageID);
+                            await SpotifyObject.WaitForInitialization(coverImage.IsLoaded);
+
+                            var mp3MetaData = new Mp3MetaData()
+                            {
+                                Title = CurrentTrack.Name,
+                                Artists = CurrentTrack.Artists.Select(artist => artist.Name),
+                                Album = CurrentTrack.Album.Name,
+                                Year = CurrentTrack.Album.ReleaseYear,
+                                Cover = coverImage.Data()
+                            };
+
+                            _SettingsManager.BehaviorSetting.AudioFileDescriptor.Write(mp3MetaData, downloadFilePath);
+
+                            coverImage.Release();
+                        }
                     }
                     else
                     {
@@ -194,7 +230,7 @@ namespace loadify.ViewModel
                     _EventAggregator.PublishOnUIThread(new DownloadContractPausedEvent(exception.ToString(), RemainingTracks.IndexOf(CurrentTrack)));
                     return;
                 }
-                catch (SpotifyException exception)
+                catch (Spotify.SpotifyException exception)
                 {
                     _Logger.Error("A Spotify error occured", exception);
                     _EventAggregator.PublishOnUIThread(new DownloadContractPausedEvent(String.Format("{0} could not be download because a Spotify error occured.", 
