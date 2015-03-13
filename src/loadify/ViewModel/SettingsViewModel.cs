@@ -13,16 +13,16 @@ namespace loadify.ViewModel
                                                     IHandle<DownloadContractResumedEvent>,
                                                     IHandle<DownloadContractStartedEvent>
     {
-        private bool _SettingsEnabled = true;
+        private bool _SettingsChangeable = true;
 
-        public bool SettingsEnabled
+        public bool SettingsChangeable
         {
-            get { return _SettingsEnabled; }
+            get { return _SettingsChangeable; }
             set
             {
-                if (_SettingsEnabled == value) return;
-                _SettingsEnabled = value;
-                NotifyOfPropertyChange(() => SettingsEnabled);
+                if (_SettingsChangeable == value) return;
+                _SettingsChangeable = value;
+                NotifyOfPropertyChange(() => SettingsChangeable);
             }
         }
 
@@ -153,17 +153,17 @@ namespace loadify.ViewModel
 
         public void Handle(DownloadContractCompletedEvent message)
         {
-            SettingsEnabled = true;
+            SettingsChangeable = true;
         }
 
         public void Handle(DownloadContractResumedEvent message)
         {
-            SettingsEnabled = false;
+            SettingsChangeable = false;
         }
 
         public void Handle(DownloadContractStartedEvent message)
         {
-            SettingsEnabled = false;
+            SettingsChangeable = false;
         }
     }
 }
