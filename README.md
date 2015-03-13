@@ -41,7 +41,7 @@ The login is as simple as it gets. You just enter your username and password you
 ***
 
 ### Dashboard
-After logging in, a new window containing your dashboard will open up. The software will ask you on the first startup if you want to fetch your playlists and display them in the left pane.
+After logging in, a new window containing your dashboard will open up. The software will ask you on the first startup if you want to fetch your playlists and displays them in the left pane.
 
 <a href="url"><img src="http://i.epvpimg.com/h6Nxc.png" align="center" height="100%" width="700" ></a>
 
