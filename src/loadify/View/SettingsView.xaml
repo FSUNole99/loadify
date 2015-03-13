@@ -9,7 +9,7 @@
              d:DesignHeight="320" d:DesignWidth="450"
              ResxExtension.DefaultResxName="loadify.Localization.Settings" Language="{UICulture}">
     <Grid>
-        <TabControl Margin="5">
+        <TabControl IsEnabled="{Binding SettingsEnabled}" Margin="5">
             <TabItem Header="{Resx Directories}">
                 <Grid Background="Transparent">
                     <Grid.ColumnDefinitions>

@@ -9,8 +9,23 @@ using loadify.Localization;
 
 namespace loadify.ViewModel
 {
-    public class SettingsViewModel : ViewModelBase
+    public class SettingsViewModel : ViewModelBase, IHandle<DownloadContractCompletedEvent>,
+                                                    IHandle<DownloadContractResumedEvent>,
+                                                    IHandle<DownloadContractStartedEvent>
     {
+        private bool _SettingsEnabled = true;
+
+        public bool SettingsEnabled
+        {
+            get { return _SettingsEnabled; }
+            set
+            {
+                if (_SettingsEnabled == value) return;
+                _SettingsEnabled = value;
+                NotifyOfPropertyChange(() => SettingsEnabled);
+            }
+        }
+
         public string DownloadDirectory
         {
             get { return _SettingsManager.DirectorySetting.DownloadDirectory; }
@@ -134,6 +149,21 @@ namespace loadify.ViewModel
             var dialogResult = dialog.ShowDialog();
             if (dialogResult == DialogResult.OK)
                 DownloadDirectory = dialog.SelectedPath;
+        }
+
+        public void Handle(DownloadContractCompletedEvent message)
+        {
+            SettingsEnabled = true;
+        }
+
+        public void Handle(DownloadContractResumedEvent message)
+        {
+            SettingsEnabled = false;
+        }
+
+        public void Handle(DownloadContractStartedEvent message)
+        {
+            SettingsEnabled = false;
         }
     }
 }
