@@ -12,11 +12,6 @@ namespace loadify
             return source.IndexOf(toCheck, comp) >= 0;
         }
 
-        public static string ValidateFileName(this string fileName)
-        {
-            return !String.IsNullOrEmpty(fileName) ? Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.Replace(c.ToString(), "-")) : "";
-        }
-
         public static void Sleep(this TimeSpan timeSpan)
         {
             new ManualResetEvent(false).WaitOne(timeSpan.Milliseconds);

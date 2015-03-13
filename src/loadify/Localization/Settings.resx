@@ -141,6 +141,9 @@
   <data name="DownloadDirectoryInfo" xml:space="preserve">
     <value>Directory where the downloaded files will be stored</value>
   </data>
+  <data name="FetchPlaylistsOnStartup" xml:space="preserve">
+    <value>Download and show playlist metadata on startup </value>
+  </data>
   <data name="FileManagement" xml:space="preserve">
     <value>File Management</value>
   </data>
@@ -152,6 +155,9 @@
   </data>
   <data name="NotifyLocalTrackDetections" xml:space="preserve">
     <value>Ask me for removing tracks that were detected to be already downloaded</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Other</value>
   </data>
   <data name="SkipOnDownloadFailures" xml:space="preserve">
     <value>Skip tracks that can not be downloaded automatically</value>

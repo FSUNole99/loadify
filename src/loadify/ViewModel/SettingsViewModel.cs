@@ -82,6 +82,20 @@ namespace loadify.ViewModel
             }
         }
 
+        public bool FetchPlaylistsOnStartup
+        {
+            get { return _SettingsManager.BehaviorSetting.FetchPlaylistsOnStartup; }
+            set
+            {
+                if (_SettingsManager.BehaviorSetting.FetchPlaylistsOnStartup == value) return;
+                _Logger.Debug(String.Format("FetchPlaylistsOnStartup setting has been changed. Old value: {0}, new value: {1}",
+                                            _SettingsManager.BehaviorSetting.FetchPlaylistsOnStartup, value));
+
+                _SettingsManager.BehaviorSetting.FetchPlaylistsOnStartup = value;
+                NotifyOfPropertyChange(() => FetchPlaylistsOnStartup);
+            }
+        }
+
         public IEnumerable<Language> SupportedLanguages
         {
             get { return _SettingsManager.LocalizationSetting.LocalizationManager.GetSupportedLanguages(); }

@@ -150,12 +150,24 @@
   <data name="DownloadPausedDialogTitle" xml:space="preserve">
     <value>Download pausiert</value>
   </data>
+  <data name="EnableFetchPlaylistsOnStartupDialogMessage" xml:space="preserve">
+    <value>Es gibt eine Einstellung die dafür sorgt, dass die Playlists bei jedem Start aktualisiert werden. Möchtest du, dass ich das für dich aktiviere? Übrigens kannst du die Einstellung jederzeit manuell ändern.</value>
+  </data>
+  <data name="EnableFetchPlaylistsOnStartupDialogTitle" xml:space="preserve">
+    <value>Playlists automatisch beim Start aktualisieren</value>
+  </data>
   <data name="ExistingTracksRemovalDialogMessage" xml:space="preserve">
     <value>Loadify hat festgestellt dass sich {0} der ausgewählten Tracks in deinem Download Verzeichnis befinden.
 Möchtest du diese Tracks abwählen?</value>
   </data>
   <data name="ExistingTracksRemovalDialogTitle" xml:space="preserve">
     <value>Existierende Tracks erkannt</value>
+  </data>
+  <data name="RefreshPlaylistDialogMessage" xml:space="preserve">
+    <value>Es sieht so aus, als ob du Loadify zum ersten Mal benutzt. Möchtest du jetzt die Playlistinformationen aktualisieren/laden?</value>
+  </data>
+  <data name="RefreshPlaylistsDialogTitle" xml:space="preserve">
+    <value>Playlists aktualisieren</value>
   </data>
   <data name="RemovePlaylistConfirmationDialogMessage" xml:space="preserve">
     <value>Möchtest du diese Playlist permanent von deinem Account entfernen?</value>

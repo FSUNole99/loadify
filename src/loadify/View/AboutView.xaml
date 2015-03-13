@@ -6,14 +6,16 @@
         GlowBrush="{DynamicResource AccentColorBrush}" ResizeMode="CanMinimize"
         Title="Loadify" Height="210" Width="380"
         ResxExtension.DefaultResxName="loadify.Localization.About" Language="{UICulture}">
+    <Window.Resources>
+        <BitmapImage x:Key="Banner" UriSource="../Resources/banner_logo.png"></BitmapImage>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="140*"/>
             <RowDefinition Height="160*"/>
             <RowDefinition Height="20*"/>
         </Grid.RowDefinitions>
-        <Label Grid.Column="0" Content="LOADIFY " HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
-               FontFamily="MV Boli" FontSize="46"/>
+        <Image Height="51" Width="270" Source="{StaticResource Banner}"/>
         <Grid Grid.Row="1" Margin="15 5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>

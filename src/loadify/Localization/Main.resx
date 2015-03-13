@@ -150,12 +150,24 @@
   <data name="DownloadPausedDialogTitle" xml:space="preserve">
     <value>Download Paused</value>
   </data>
+  <data name="EnableFetchPlaylistsOnStartupDialogMessage" xml:space="preserve">
+    <value>There is a setting that you can enable to update your playlists on every startup. Do you want me to enable it for you? Please note that you can enable the setting by yourself whenever you wish to</value>
+  </data>
+  <data name="EnableFetchPlaylistsOnStartupDialogTitle" xml:space="preserve">
+    <value>Refreshing Playlists automatically on startup</value>
+  </data>
   <data name="ExistingTracksRemovalDialogMessage" xml:space="preserve">
     <value>Loadify detected that you already have {0} of the selected tracks in your download directory. 
 Do you want to remove them from your download contract?</value>
   </data>
   <data name="ExistingTracksRemovalDialogTitle" xml:space="preserve">
     <value>Detected existing Tracks</value>
+  </data>
+  <data name="RefreshPlaylistDialogMessage" xml:space="preserve">
+    <value>It seems that you are using Loadify for the first time. Do you want to refresh/load your playlist metadata?</value>
+  </data>
+  <data name="RefreshPlaylistsDialogTitle" xml:space="preserve">
+    <value>Refreshing Playlists</value>
   </data>
   <data name="RemovePlaylistConfirmationDialogMessage" xml:space="preserve">
     <value>Do you want to permanently remove this playlist from your account?</value>

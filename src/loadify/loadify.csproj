@@ -69,8 +69,7 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>Resources\logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Caliburn.Micro">
@@ -137,11 +136,13 @@
     <Compile Include="Configuration\IBehaviorSetting.cs" />
     <Compile Include="Configuration\ICredentialsSetting.cs" />
     <Compile Include="Configuration\IDirectorySetting.cs" />
+    <Compile Include="Configuration\IInternalSetting.cs" />
     <Compile Include="Configuration\ILocalizationSetting.cs" />
     <Compile Include="Configuration\ISettingsManager.cs" />
     <Compile Include="Configuration\NETBehaviorSetting.cs" />
     <Compile Include="Configuration\NETCredentialsSetting.cs" />
     <Compile Include="Configuration\NETDirectorySetting.cs" />
+    <Compile Include="Configuration\NETInternalSetting.cs" />
     <Compile Include="Configuration\NETLocalizationSetting.cs" />
     <Compile Include="Configuration\NETSettingsManager.cs" />
     <Compile Include="Event\AddPlaylistRequestEvent.cs" />
@@ -488,6 +489,8 @@
     <Content Include="libmp3lame.64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\logo.ico" />
+    <Resource Include="Resources\banner_logo.png" />
     <Resource Include="Resources\minus.png" />
     <Resource Include="Resources\plus.png" />
     <Resource Include="Resources\search.png" />

@@ -118,5 +118,29 @@ namespace loadify.Properties {
                 this["UILanguage"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool FetchPlaylistsOnStartup {
+            get {
+                return ((bool)(this["FetchPlaylistsOnStartup"]));
+            }
+            set {
+                this["FetchPlaylistsOnStartup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool FirstUsage {
+            get {
+                return ((bool)(this["FirstUsage"]));
+            }
+            set {
+                this["FirstUsage"] = value;
+            }
+        }
     }
 }

@@ -11,5 +11,6 @@ namespace loadify.Configuration
         IAudioFileDescriptor AudioFileDescriptor { get; set; }
         IDownloadPathConfigurator DownloadPathConfigurator { get; set; }
         bool SkipOnDownloadFailures { get; set; }
+        bool FetchPlaylistsOnStartup { get; set; }
     }
 }

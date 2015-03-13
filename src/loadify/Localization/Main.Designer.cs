@@ -160,6 +160,24 @@ namespace loadify.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is a setting that you can enable to update your playlists on every startup. Do you want me to enable it for you? Please note that you can enable the setting by yourself whenever you wish to.
+        /// </summary>
+        public static string EnableFetchPlaylistsOnStartupDialogMessage {
+            get {
+                return ResourceManager.GetString("EnableFetchPlaylistsOnStartupDialogMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refreshing Playlists automatically on startup.
+        /// </summary>
+        public static string EnableFetchPlaylistsOnStartupDialogTitle {
+            get {
+                return ResourceManager.GetString("EnableFetchPlaylistsOnStartupDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loadify detected that you already have {0} of the selected tracks in your download directory. 
         ///Do you want to remove them from your download contract?.
         /// </summary>
@@ -175,6 +193,24 @@ namespace loadify.Localization {
         public static string ExistingTracksRemovalDialogTitle {
             get {
                 return ResourceManager.GetString("ExistingTracksRemovalDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It seems that you are using Loadify for the first time. Do you want to refresh/load your playlist metadata?.
+        /// </summary>
+        public static string RefreshPlaylistDialogMessage {
+            get {
+                return ResourceManager.GetString("RefreshPlaylistDialogMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refreshing Playlists.
+        /// </summary>
+        public static string RefreshPlaylistsDialogTitle {
+            get {
+                return ResourceManager.GetString("RefreshPlaylistsDialogTitle", resourceCulture);
             }
         }
         
